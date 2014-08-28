@@ -1,7 +1,9 @@
 pimatic-mpd
 ===========
 
-config:
+pimatic plugin for controlling the [Music Player Daemon](http://www.musicpd.org/).
+
+###device config example:
 
 ```json
 {
