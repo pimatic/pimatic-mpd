@@ -6,7 +6,8 @@
   "files": [
     "mpd.coffee",
     "README.md",
-    "mpd-config-schema.coffee"
+    "mpd-config-schema.coffee",
+    "device-config-schema.coffee"
   ],
   "version": "0.8.0",
   "homepage": "http://your-plugin-website",
