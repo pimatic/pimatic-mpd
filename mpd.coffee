@@ -62,12 +62,17 @@ module.exports = (env) ->
         host: @config.host      
       )
 
-      @_connectionPromise = new Promise( (resolve) =>
-        @_client.once("ready", => 
-          console.log "ready"
+      @_connectionPromise = new Promise( (resolve, reject) =>
+        onReady = =>
+          @_client.removeListener('error', onError)
           resolve()
-        )
-      ).timeout(20000)
+        onError = =>
+          @client.removeListener('ready', onReady)
+          reject()
+        @_client.once("ready", onReady)
+        @_client.once("error", onError)
+        return
+      )
 
       @_connectionPromise.then( => @_updateInfo() ).catch( (error) =>
         env.logger.error(error)
