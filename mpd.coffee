@@ -61,13 +61,13 @@ module.exports = (env) ->
         port: @config.port
         host: @config.host      
       )
-
+      
       @_connectionPromise = new Promise( (resolve, reject) =>
         onReady = =>
           @_client.removeListener('error', onError)
           resolve()
         onError = =>
-          @client.removeListener('ready', onReady)
+          @_client.removeListener('ready', onReady)
           reject()
         @_client.once("ready", onReady)
         @_client.once("error", onError)
