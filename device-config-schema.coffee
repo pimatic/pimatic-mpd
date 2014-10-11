@@ -3,6 +3,7 @@ module.exports ={
   MpdPlayer: {
     title: "MpdPlayer config options"
     type: "object"
+    extensions: ["xLink"]
     properties:
       port:
         description: "The gpio pin"
