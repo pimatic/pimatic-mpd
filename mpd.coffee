@@ -6,6 +6,9 @@ module.exports = (env) ->
   # Require the [cassert library](https://github.com/rhoot/cassert).
   assert = env.require 'cassert'
 
+  M = env.matcher
+  _ = env.require('lodash')
+
   mpd = require "mpd"
   Promise.promisifyAll(mpd.prototype)
 
@@ -22,6 +25,9 @@ module.exports = (env) ->
         configDef: deviceConfigDef.MpdPlayer, 
         createCallback: (config) => new MpdPlayer(config)
       })
+
+      @framework.ruleManager.addActionProvider(new mpdPauseActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new mpdPlayActionProvider(@framework))
 
       #client.on("system", (name) -> console.log "update", name )
 
@@ -138,6 +144,104 @@ module.exports = (env) ->
         )
       )
 
+  class mpdPauseActionProvider extends env.actions.ActionProvider 
+  
+    constructor: (@framework) -> 
+    # ### executeAction()
+    ###
+    This function handles action in the form of `execute "some string"`
+    ###
+    parseAction: (input, context) =>
+
+      retVar = null
+
+      mpdPlayers = _(@framework.deviceManager.devices).values().filter( 
+        (device) => device.hasAction("play") 
+      ).value()
+
+      if mpdPlayers.length is 0 then return
+
+      device = null
+      match = null
+
+      onDeviceMatch = ( (m, d) -> device = d; match = m.getFullMatch() )
+
+      m = M(input, context)
+        .match('pause ')
+        .matchDevice(mpdPlayers, onDeviceMatch)
+        
+      if match?
+        assert device?
+        assert typeof match is "string"
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          actionHandler: new mpdPauseActionHandler(device)
+        }
+      else
+        return null
+
+  class mpdPauseActionHandler extends env.actions.ActionHandler
+
+    constructor: (@device) -> #nop
+
+    executeAction: (simulate) => 
+      return (
+        if simulate
+          Promise.resolve __("would pause %s", @device.name)
+        else
+          @device.pause().then( => __("paused %s", @device.name) )
+      )
+
+  class mpdPlayActionProvider extends env.actions.ActionProvider 
+  
+    constructor: (@framework) -> 
+    # ### executeAction()
+    ###
+    This function handles action in the form of `execute "some string"`
+    ###
+    parseAction: (input, context) =>
+
+      retVar = null
+
+      mpdPlayers = _(@framework.deviceManager.devices).values().filter( 
+        (device) => device.hasAction("play") 
+      ).value()
+
+      if mpdPlayers.length is 0 then return
+
+      device = null
+      match = null
+
+      onDeviceMatch = ( (m, d) -> device = d; match = m.getFullMatch() )
+
+      m = M(input, context)
+        .match('play ')
+        .matchDevice(mpdPlayers, onDeviceMatch)
+        
+      if match?
+        assert device?
+        assert typeof match is "string"
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          actionHandler: new mpdPlayActionHandler(device)
+        }
+      else
+        return null
+        
+  class mpdPlayActionHandler extends env.actions.ActionHandler
+
+    constructor: (@device) -> #nop
+
+    executeAction: (simulate) => 
+      return (
+        if simulate
+          Promise.resolve __("would play %s", @device.name)
+        else
+          @device.play().then( => __("paused %s", @device.name) )
+      )
+      
   # ###Finally
   # Create a instance of my plugin
   mpdPlugin = new MpdPlugin

@@ -6,10 +6,10 @@ module.exports ={
     extensions: ["xLink"]
     properties:
       port:
-        description: "The gpio pin"
+        description: "The port of mpd server"
         type: "number"
       host:
-        description: "The host"
+        description: "The address of mpd server"
         type: "string"
   }
 }

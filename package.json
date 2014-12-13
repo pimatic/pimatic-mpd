@@ -1,7 +1,11 @@
 {
   "name": "pimatic-mpd",
   "description": "pimatic plugin for controlling the Music Player Daemon",
-  "author": "Oliver Schneider <oliverschneider89+sweetpi@gmail.com> (http://sweetpi.de)",
+  "author": {
+    "name": "Oliver Schneider",
+    "email": "oliverschneider89+sweetpi@gmail.com",
+    "url": "http://sweetpi.de"
+  },
   "main": "mpd",
   "files": [
     "mpd.coffee",
@@ -25,5 +29,16 @@
   "engines": {
     "node": ">0.8.x",
     "npm": ">1.1.x"
-  }
+  },
+  "readme": "pimatic-mpd\n===========\n\npimatic plugin for controlling the [Music Player Daemon](http://www.musicpd.org/).\n\n###device config example:\n\n```json\n{\n  \"id\": \"mpd-player\",\n  \"name\": \"Music\",\n  \"class\": \"MpdPlayer\",\n  \"host\": \"192.168.1.2\",\n  \"port\": 6600\n}\n```",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/pimatic/pimatic-mpd/issues"
+  },
+  "_id": "pimatic-mpd@0.8.1",
+  "dist": {
+    "shasum": "a1cc9f8c4d0613dbc9e67cc677708755323be762"
+  },
+  "_from": "pimatic-mpd@",
+  "_resolved": "https://registry.npmjs.org/pimatic-mpd/-/pimatic-mpd-0.8.1.tgz"
 }
