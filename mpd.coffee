@@ -56,6 +56,9 @@ module.exports = (env) ->
       state:
         description: "the current state of the player"
         type: "string"
+      volume:
+        description: "the volume of the player"
+        type: "string"
 
     template: "musicplayer"
 
@@ -98,6 +101,7 @@ module.exports = (env) ->
 
     getCurrentTitle: () -> Promise.resolve(@_currentTitle)
     getCurrentArtist: () -> Promise.resolve(@_currentTitle)
+    getVolume: ()  -> Promise.resolve(@_volume)
     play: () -> @_sendCommandAction('pause', '0')
     pause: () -> @_sendCommandAction('pause', '1')
     previous: () -> @_sendCommandAction('previous')
@@ -120,10 +124,16 @@ module.exports = (env) ->
         @_currentArtist = artist
         @emit 'currentArtist', artist
 
+    _setVolume: (volume) ->
+      if @_volume isnt volume
+        @_volume = volume
+        @emit 'volume', volume
+
     _getStatus: () ->
       @_client.sendCommandAsync(mpd.cmd("status", [])).then( (msg) =>
         info = mpd.parseKeyValueMessage(msg)
         @_setState(info.state)
+        @_setVolume(info.volume)
         #if info.songid isnt @_currentTrackId
       )
 
