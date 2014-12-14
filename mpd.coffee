@@ -98,6 +98,13 @@ module.exports = (env) ->
         )
       )
 
+      @_client.on("system-mixer", =>
+        return @_updateInfo().catch( (err) =>
+          env.logger.error "Error sending mpd command: #{err}"
+          env.logger.debug err
+        )
+      )
+
       super()
 
     getState: () ->
