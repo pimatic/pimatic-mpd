@@ -6,9 +6,11 @@
     "email": "oliverschneider89+sweetpi@gmail.com",
     "url": "http://sweetpi.de"
   },
-  "contributors": [{
-    "name": "Tom Jans"
-  }],
+  "contributors": [
+    {
+      "name": "Tom Jans"
+    }
+  ],
   "main": "mpd",
   "files": [
     "mpd.coffee",
@@ -16,7 +18,7 @@
     "mpd-config-schema.coffee",
     "device-config-schema.coffee"
   ],
-  "version": "0.8.1",
+  "version": "0.8.2",
   "homepage": "http://www.pimatic.org",
   "repository": {
     "type": "git",
