@@ -28,6 +28,7 @@ module.exports = (env) ->
 
       @framework.ruleManager.addActionProvider(new mpdPauseActionProvider(@framework))
       @framework.ruleManager.addActionProvider(new mpdPlayActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new mpdVolumeActionProvider(@framework))
 
       #client.on("system", (name) -> console.log "update", name )
 
@@ -35,6 +36,7 @@ module.exports = (env) ->
     _state: null
     _currentTitle: null
     _currentArtist: null
+    _volume: null
 
     actions: 
       play:
@@ -45,6 +47,8 @@ module.exports = (env) ->
         description: "play next song"
       previous:
         description: "play previous song"
+      volume:
+        description: "Change volume of player"
 
     attributes:
       currentArtist:
@@ -106,6 +110,7 @@ module.exports = (env) ->
     pause: () -> @_sendCommandAction('pause', '1')
     previous: () -> @_sendCommandAction('previous')
     next: () -> @_sendCommandAction('next')
+    setVolume: (volume) -> @_sendCommandAction('setvol', volume)
 
     _updateInfo: -> Promise.all([@_getStatus(), @_getCurrentSong()])
 
@@ -251,6 +256,70 @@ module.exports = (env) ->
         else
           @device.play().then( => __("paused %s", @device.name) )
       )
+
+  class mpdVolumeActionProvider extends env.actions.ActionProvider 
+  
+    constructor: (@framework) -> 
+    # ### executeAction()
+    ###
+    This function handles action in the form of `execute "some string"`
+    ###
+    parseAction: (input, context) =>
+
+      retVar = null
+      volume = null
+
+      mpdPlayers = _(@framework.deviceManager.devices).values().filter( 
+        (device) => device.hasAction("play") 
+      ).value()
+
+      if mpdPlayers.length is 0 then return
+
+      device = null
+      valueTokens = null
+      match = null
+
+      onDeviceMatch = ( (m, d) -> device = d; match = m.getFullMatch() )
+
+      M(input, context)
+        .match('change volume of ')
+        .matchDevice(mpdPlayers, (next,d) =>
+          next.match(' to ', (next) =>
+            next.matchNumericExpression( (next, ts) =>
+              m = next.match('%', optional: yes)
+              if device? and device.id isnt d.id
+                context?.addError(""""#{input.trim()}" is ambiguous.""")
+                return
+              device = d
+              valueTokens = ts
+              match = m.getFullMatch()
+            )
+          )
+        )
+
+        
+      if match?
+        assert device?
+        assert typeof match is "string"
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          actionHandler: new mpdVolumeActionHandler(device,valueTokens[0])
+        }
+      else
+        return null
+        
+  class mpdVolumeActionHandler extends env.actions.ActionHandler
+
+    constructor: (@device, @volume) -> #nop
+
+    executeAction: (simulate) => 
+      return (
+        if simulate
+          Promise.resolve __("would set volume of %s to %s", @device.name, @volume)
+        else
+          @device.setVolume(@volume).then( => __("set volume of %s to %s", @device.name, @volume) )
+      )      
       
   # ###Finally
   # Create a instance of my plugin
