@@ -309,26 +309,38 @@ module.exports = (env) ->
 
         
       if match?
+        value = valueTokens[0] 
         assert device?
         assert typeof match is "string"
+        value = parseFloat(value)
+        if value < 0.0
+          context?.addError("Can't dim to a negativ dimlevel.")
+          return
+        if value > 100.0
+          context?.addError("Can't dim to greaer than 100%.")
+          return
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new mpdVolumeActionHandler(device,valueTokens[0])
+          actionHandler: new mpdVolumeActionHandler(@framework,device,valueTokens)
         }
       else
         return null
         
   class mpdVolumeActionHandler extends env.actions.ActionHandler
 
-    constructor: (@device, @volume) -> #nop
+    constructor: (@framework, @device, @valueTokens) -> #nop
 
-    executeAction: (simulate) => 
+    executeAction: (simulate, value) => 
       return (
-        if simulate
-          Promise.resolve __("would set volume of %s to %s", @device.name, @volume)
+        if isNaN(@valueTokens[0])
+          val = @framework.variableManager.getVariableValue(@valueTokens[0].substring(1))
         else
-          @device.setVolume(@volume).then( => __("set volume of %s to %s", @device.name, @volume) )
+          val = @valueTokens[0]     
+        if simulate
+          Promise.resolve __("would set volume of %s to %s", @device.name, val)
+        else   
+          @device.setVolume(val).then( => __("set volume of %s to %s", @device.name, val) )
       )   
 
   class mpdNextActionProvider extends env.actions.ActionProvider 
