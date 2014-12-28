@@ -26,11 +26,11 @@ module.exports = (env) ->
         createCallback: (config) => new MpdPlayer(config)
       })
 
-      @framework.ruleManager.addActionProvider(new mpdPauseActionProvider(@framework))
-      @framework.ruleManager.addActionProvider(new mpdPlayActionProvider(@framework))
-      @framework.ruleManager.addActionProvider(new mpdVolumeActionProvider(@framework))
-      @framework.ruleManager.addActionProvider(new mpdPrevActionProvider(@framework))
-      @framework.ruleManager.addActionProvider(new mpdNextActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new MpdPauseActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new MpdPlayActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new MpdVolumeActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new MpdPrevActionProvider(@framework))
+      @framework.ruleManager.addActionProvider(new MpdNextActionProvider(@framework))
 
       #client.on("system", (name) -> console.log "update", name )
 
@@ -169,7 +169,7 @@ module.exports = (env) ->
       )
 
   # Pause play volume actions
-  class mpdPauseActionProvider extends env.actions.ActionProvider 
+  class MpdPauseActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
@@ -201,12 +201,12 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new mpdPauseActionHandler(device)
+          actionHandler: new MpdPauseActionHandler(device)
         }
       else
         return null
 
-  class mpdPauseActionHandler extends env.actions.ActionHandler
+  class MpdPauseActionHandler extends env.actions.ActionHandler
 
     constructor: (@device) -> #nop
 
@@ -218,7 +218,7 @@ module.exports = (env) ->
           @device.pause().then( => __("paused %s", @device.name) )
       )
 
-  class mpdPlayActionProvider extends env.actions.ActionProvider 
+  class MpdPlayActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
@@ -267,7 +267,7 @@ module.exports = (env) ->
           @device.play().then( => __("paused %s", @device.name) )
       )
 
-  class mpdVolumeActionProvider extends env.actions.ActionProvider 
+  class MpdVolumeActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
@@ -322,12 +322,12 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new mpdVolumeActionHandler(@framework,device,valueTokens)
+          actionHandler: new MpdVolumeActionHandler(@framework,device,valueTokens)
         }
       else
         return null
         
-  class mpdVolumeActionHandler extends env.actions.ActionHandler
+  class MpdVolumeActionHandler extends env.actions.ActionHandler
 
     constructor: (@framework, @device, @valueTokens) -> #nop
 
@@ -343,7 +343,7 @@ module.exports = (env) ->
           @device.setVolume(val).then( => __("set volume of %s to %s", @device.name, val) )
       )   
 
-  class mpdNextActionProvider extends env.actions.ActionProvider 
+  class MpdNextActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
@@ -378,12 +378,12 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new mpdNextActionHandler(device)
+          actionHandler: new MpdNextActionHandler(device)
         }
       else
         return null
         
-  class mpdNextActionHandler extends env.actions.ActionHandler
+  class MpdNextActionHandler extends env.actions.ActionHandler
     constructor: (@device) -> #nop
 
     executeAction: (simulate) => 
@@ -394,7 +394,7 @@ module.exports = (env) ->
           @device.next().then( => __("play next track of %s", @device.name) )
       )      
 
-  class mpdPrevActionProvider extends env.actions.ActionProvider 
+  class MpdPrevActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
@@ -429,12 +429,12 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new mpdNextActionHandler(device)
+          actionHandler: new MpdNextActionHandler(device)
         }
       else
         return null
         
-  class mpdPrevActionHandler extends env.actions.ActionHandler
+  class MpdPrevActionHandler extends env.actions.ActionHandler
     constructor: (@device) -> #nop
 
     executeAction: (simulate) => 
