@@ -18,7 +18,7 @@
     "mpd-config-schema.coffee",
     "device-config-schema.coffee"
   ],
-  "version": "0.8.3",
+  "version": "0.8.4",
   "homepage": "http://www.pimatic.org",
   "repository": {
     "type": "git",
