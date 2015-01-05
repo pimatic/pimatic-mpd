@@ -264,7 +264,7 @@ module.exports = (env) ->
         if simulate
           Promise.resolve __("would play %s", @device.name)
         else
-          @device.play().then( => __("paused %s", @device.name) )
+          @device.play().then( => __("playing %s", @device.name) )
       )
 
   class MpdVolumeActionProvider extends env.actions.ActionProvider 
