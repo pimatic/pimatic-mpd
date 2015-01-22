@@ -115,7 +115,11 @@ module.exports = (env) ->
     getCurrentTitle: () -> Promise.resolve(@_currentTitle)
     getCurrentArtist: () -> Promise.resolve(@_currentTitle)
     getVolume: ()  -> Promise.resolve(@_volume)
-    play: () -> @_sendCommandAction('play')
+    play: () ->
+      switch @state
+        when 'stop' then @_sendCommandAction('play')
+        when 'pause' then @_sendCommandAction('pause', '0')
+        else Promise.resolve()
     pause: () -> @_sendCommandAction('pause', '1')
     previous: () -> @_sendCommandAction('previous')
     next: () -> @_sendCommandAction('next')
