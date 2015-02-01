@@ -226,7 +226,7 @@ module.exports = (env) ->
       )
       
   # stop play volume actions
-  class MpdPauseActionProvider extends env.actions.ActionProvider 
+  class MpdStopActionProvider extends env.actions.ActionProvider 
   
     constructor: (@framework) -> 
     # ### executeAction()
