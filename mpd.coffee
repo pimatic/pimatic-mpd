@@ -258,12 +258,12 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new MpdPauseActionHandler(device)
+          actionHandler: new MpdStopActionHandler(device)
         }
       else
         return null
 
-  class MpdPauseActionHandler extends env.actions.ActionHandler
+  class MpdStopActionHandler extends env.actions.ActionHandler
 
     constructor: (@device) -> #nop
 
