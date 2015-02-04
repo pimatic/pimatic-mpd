@@ -45,6 +45,8 @@ module.exports = (env) ->
         description: "starts playing"
       pause:
         description: "pauses playing"
+      stop:
+        description: "stops playing"
       next:
         description: "play next song"
       previous:
@@ -121,6 +123,7 @@ module.exports = (env) ->
         when 'pause' then @_sendCommandAction('pause', '0')
         else Promise.resolve()
     pause: () -> @_sendCommandAction('pause', '1')
+    stop: () -> @_sendCommandAction('stop')
     previous: () -> @_sendCommandAction('previous')
     next: () -> @_sendCommandAction('next')
     setVolume: (volume) -> @_sendCommandAction('setvol', volume)
@@ -220,6 +223,56 @@ module.exports = (env) ->
           Promise.resolve __("would pause %s", @device.name)
         else
           @device.pause().then( => __("paused %s", @device.name) )
+      )
+      
+  # stop play volume actions
+  class MpdStopActionProvider extends env.actions.ActionProvider 
+  
+    constructor: (@framework) -> 
+    # ### executeAction()
+    ###
+    This function handles action in the form of `execute "some string"`
+    ###
+    parseAction: (input, context) =>
+
+      retVar = null
+
+      mpdPlayers = _(@framework.deviceManager.devices).values().filter( 
+        (device) => device.hasAction("play") 
+      ).value()
+
+      if mpdPlayers.length is 0 then return
+
+      device = null
+      match = null
+
+      onDeviceMatch = ( (m, d) -> device = d; match = m.getFullMatch() )
+
+      m = M(input, context)
+        .match('stop ')
+        .matchDevice(mpdPlayers, onDeviceMatch)
+        
+      if match?
+        assert device?
+        assert typeof match is "string"
+        return {
+          token: match
+          nextInput: input.substring(match.length)
+          actionHandler: new MpdStopActionHandler(device)
+        }
+      else
+        return null
+
+  class MpdStopActionHandler extends env.actions.ActionHandler
+
+    constructor: (@device) -> #nop
+
+    executeAction: (simulate) => 
+      return (
+        if simulate
+          Promise.resolve __("would stop %s", @device.name)
+        else
+          @device.stop().then( => __("stop %s", @device.name) )
       )
 
   class MpdPlayActionProvider extends env.actions.ActionProvider 
