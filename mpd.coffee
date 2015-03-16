@@ -83,29 +83,30 @@ module.exports = (env) ->
         onReady = =>
           @_client.removeListener('error', onError)
           resolve()
-        onError = =>
+        onError = (err) =>
           @_client.removeListener('ready', onReady)
-          reject()
+          reject(err)
         @_client.once("ready", onReady)
         @_client.once("error", onError)
         return
       )
 
-      @_connectionPromise.then( => @_updateInfo() ).catch( (error) =>
-        env.logger.error(error)
+      @_connectionPromise.then( => @_updateInfo() ).catch( (err) =>
+        env.logger.error "Error on connecting to mpd: #{err.message}"
+        env.logger.debug err.stack
       )
 
       @_client.on("system-player", =>
         return @_updateInfo().catch( (err) =>
-          env.logger.error "Error sending mpd command: #{err}"
-          env.logger.debug err
+          env.logger.error "Error sending mpd command: #{err.message}"
+          env.logger.debug err.stack
         )
       )
 
       @_client.on("system-mixer", =>
         return @_updateInfo().catch( (err) =>
-          env.logger.error "Error sending mpd command: #{err}"
-          env.logger.debug err
+          env.logger.error "Error sending mpd command: #{err.message}"
+          env.logger.debug err.stack
         )
       )
 
@@ -164,8 +165,8 @@ module.exports = (env) ->
         @_setCurrentTitle(if info.Title? then info.Title else "")
         @_setCurrentArtist(if info.Name? then info.Name else "")
       ).catch( (err) =>
-        env.logger.error "Error sending mpd command: #{err}"
-        env.logger.debug err
+        env.logger.error "Error sending mpd command: #{err.message}"
+        env.logger.debug err.stack
       )
 
     _sendCommandAction: (action, args...) ->
