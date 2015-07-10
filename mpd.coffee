@@ -33,7 +33,11 @@ module.exports = (env) ->
     constructor: (@config) ->
       @name = config.name
       @id = config.id
+      @_connect()
+      super()
 
+    _connect: () ->
+      env.logger.debug("Connection to mpd #{@config.host}:#{@config.port}")
       @_client = mpd.connect(
         port: @config.port
         host: @config.host      
@@ -41,6 +45,7 @@ module.exports = (env) ->
       
       @_connectionPromise = new Promise( (resolve, reject) =>
         onReady = =>
+          @_lastError = null  
           @_client.removeListener('error', onError)
           resolve()
         onError = (err) =>
@@ -52,6 +57,9 @@ module.exports = (env) ->
       )
 
       @_connectionPromise.then( => @_updateInfo() ).catch( (err) =>
+        if @_lastError?.message is err.message
+          return
+        @_lastError = err
         env.logger.error "Error on connecting to mpd: #{err.message}"
         env.logger.debug err.stack
       )
@@ -70,7 +78,13 @@ module.exports = (env) ->
         )
       )
 
-      super()
+      @_client.on("end", =>
+        env.logger.debug("Connection to mpd lost")
+        @_reconnect()
+      )
+
+    _reconnect: () ->
+      setTimeout((=> @_connect()), 10000)
 
     play: () ->
       switch @_state
