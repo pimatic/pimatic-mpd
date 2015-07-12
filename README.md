@@ -23,6 +23,9 @@ if smartphone is present then play mpd-player
 <b>Pause music</b><br>
 if smartphone is absent then pause mpd-player
 
+<b>Stop music</b><br>
+if smartphone is absent then stop mpd-player
+
 <b>Change volume</b><br>
 if buttonVolumeLow is pressed then change volume of mpd-player to 5
 
