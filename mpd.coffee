@@ -31,8 +31,8 @@ module.exports = (env) ->
   class MpdPlayer extends env.devices.AVPlayer
 
     constructor: (@config) ->
-      @name = config.name
-      @id = config.id
+      @name = @config.name
+      @id = @config.id
       @_connect()
       super()
 
